@@ -1155,6 +1155,8 @@ func RecursiveFun(parent_id int, prefix, dpath string, c *DocumentController, bo
 				beego.Error(err)
 				c.Abort("500")
 			}
+			
+			docker_baseurl := "http://127.0.0.1:" + beego.AppConfig.String("httpport")
 
 			html, err := c.ExecuteViewPathTemplate("document/export.tpl", map[string]interface{}{"Model": book, "Lists": item, "BaseUrl": c.BaseUrl()})
 			if err != nil {
@@ -1167,7 +1169,7 @@ func RecursiveFun(parent_id int, prefix, dpath string, c *DocumentController, bo
 			doc, err := goquery.NewDocumentFromReader(buf)
 			doc.Find("img").Each(func(i int, contentSelection *goquery.Selection) {
 				if src, ok := contentSelection.Attr("src"); ok && strings.HasPrefix(src, "/uploads/") {
-					contentSelection.SetAttr("src", c.BaseUrl()+src)
+					contentSelection.SetAttr("src", docker_baseurl+src)
 				}
 			})
 			html, err = doc.Html()
